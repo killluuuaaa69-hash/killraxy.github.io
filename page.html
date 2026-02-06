@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vivek’s Valentine</title>
+  <style>
+    :root{
+      --bg1:#fff7fb;
+      --bg2:#f7fbff;
+      --ink:#1d1d1f;
+      --muted:#6b6b73;
+      --card:#ffffffcc;
+      --stroke:#00000010;
+      --shadow: 0 18px 50px rgba(0,0,0,.08);
+      --radius: 22px;
+      --accent:#ff4d8d;
+      --accent2:#ff7fb2;
+      --paper:#fffaf1;
+      --tape:#ffe3ef;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 500px at 12% 10%, #ffe6f1 0%, transparent 55%),
+        radial-gradient(900px 500px at 85% 35%, #e8f4ff 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* floating minimalist hearts */
+    .floaty{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.55;
+    }
+    .heart{
+      position:absolute;
+      width:18px;height:18px;
+      transform: rotate(12deg);
+      filter: blur(.0px);
+      animation: drift 12s linear infinite;
+    }
+    .heart svg{width:100%;height:100%}
+    @keyframes drift{
+      0%{ transform: translateY(20px) translateX(0) rotate(12deg); opacity:0}
+      10%{opacity:.9}
+      100%{ transform: translateY(-110vh) translateX(40px) rotate(24deg); opacity:0}
+    }
+
+    /* page layout */
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 72px 18px 110px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:22px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      color:var(--muted);
+      font-size:14px;
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    .brand b{color:var(--ink)}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background:#ffffffaa;
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.05);
+      font-size:13px;
+      color:var(--muted);
+      user-select:none;
+    }
+
+    .stack{
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+    }
+
+    /* cards that reveal on scroll */
+    section.card{
+      position:relative;
+      border-radius: var(--radius);
+      border:1px solid var(--stroke);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      padding: 26px 22px;
+      min-height: 72vh;
+      overflow:hidden;
+
+      transform: translateY(22px);
+      opacity:0;
+      transition: transform .75s cubic-bezier(.2,.9,.2,1), opacity .75s ease;
+    }
+    section.card.visible{
+      transform: translateY(0);
+      opacity:1;
+    }
+
+    .card h1{
+      margin:0;
+      font-size: clamp(26px, 3.2vw, 44px);
+      line-height:1.05;
+      letter-spacing:-.02em;
+    }
+    .sub{
+      margin-top:10px;
+      max-width: 62ch;
+      color:var(--muted);
+      font-size: 15px;
+      line-height:1.55;
+    }
+
+    .divider{
+      margin:18px 0 16px;
+      height:1px;
+      background:linear-gradient(90deg, transparent, rgba(0,0,0,.12), transparent);
+    }
+
+    /* Cute “clip-note” style */
+    .notes{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .note{
+      grid-column: span 6;
+      background: var(--paper);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      padding: 34px 34px 34px 34px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.06);
+      position:relative;
+      transform: rotate(var(--tilt, -1deg));
+    }
+    .note strong{display:block; font-size:14px; margin-bottom:6px}
+    .note p{margin:0; color:var(--ink); font-size:14px; line-height:1.4}
+    .note::before{
+      /* tape */
+      content:"";
+      position:absolute;
+      top:-12px; left:22px;
+      width: 88px; height: 22px;
+      background: linear-gradient(90deg, #ffd3e6, #ffe5f0);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius: 10px;
+      transform: rotate(-5deg);
+      opacity:.95;
+      box-shadow: 0 8px 18px rgba(0,0,0,.05);
+    }
+    .note::after{
+      /* tiny heart stamp */
+      content:"♥";
+      position:absolute;
+      right:24px; top:22px;
+      font-size: 24px;
+      color: var(--accent);
+      opacity:.75;
+    }
+
+    @media (max-width: 720px){
+      .note{grid-column: span 12}
+    }
+
+    /* page 1 extra vibe */
+    .page1-bg{
+      position:absolute;
+      inset:0;
+      opacity:.55;
+      pointer-events:none;
+    }
+    .page1-bg .blob{
+      position:absolute;
+      width: 380px; height: 380px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffd4e6, transparent 62%);
+      filter: blur(0px);
+    }
+    .page1-bg .blob.b1{left:-120px; top:-140px}
+    .page1-bg .blob.b2{right:-140px; bottom:-180px; background: radial-gradient(circle at 40% 40%, #d7f0ff, transparent 62%)}
+    .mini-clipart{
+      position:absolute;
+      right: 18px;
+      top: 18px;
+      opacity:.8;
+      transform: rotate(6deg);
+    }
+
+    /* Page 2: “ooooo” background idea */
+    .oooo-bg{
+      position:absolute;
+      inset:-40px;
+      opacity:.12;
+      pointer-events:none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='240'%3E%3Crect width='100%25' height='100%25' fill='white'/%3E%3Cg fill='%23ff4d8d' fill-opacity='1' font-family='Arial' font-size='44'%3E%3Ctext x='22' y='68'%3Esooooooo%3C/text%3E%3Ctext x='180' y='160'%3Esooooooo%3C/text%3E%3Ctext x='40' y='210'%3Esooooooo%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-size: 420px 240px;
+      background-repeat: repeat;
+      transform: rotate(-6deg);
+    }
+
+    .love-line{
+      margin-top: 12px;
+      font-size: clamp(18px, 2.1vw, 26px);
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+    .love-line .ooo{
+      color: var(--accent);
+      letter-spacing: .08em;
+      font-weight: 700;
+    }
+
+    /* Page 3: quiz */
+    .quiz{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 860px){
+      .quiz{grid-template-columns: 1fr; }
+    }
+
+    .options{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .opt{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#ffffffdd;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .opt:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.07);
+      border-color: rgba(255,77,141,.35);
+    }
+    .opt.selected{
+      border-color: rgba(255,77,141,.55);
+      box-shadow: 0 16px 34px rgba(255,77,141,.12);
+    }
+    .opt .label{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-size: 15px;
+    }
+    .badge{
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      background: linear-gradient(180deg, #fff, #fff2f8);
+      border:1px solid rgba(0,0,0,.06);
+      color: var(--accent);
+      font-weight:700;
+    }
+    .opt .hint{
+      color:var(--muted);
+      font-size: 13px;
+      white-space:nowrap;
+    }
+
+    .reaction{
+      border-radius: 18px;
+      border:1px solid rgba(0,0,0,.08);
+      background: #ffffffdd;
+      overflow:hidden;
+      box-shadow: 0 14px 28px rgba(0,0,0,.06);
+    }
+    .reaction .top{
+      padding: 12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .reaction .top b{font-size: 14px}
+    .reaction .top span{color:var(--muted); font-size: 13px}
+    .reaction .gif{
+      width:100%;
+      aspect-ratio: 4/3;
+      display:block;
+      object-fit: cover;
+      background: #fafafa;
+    }
+
+    .actions{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    button{
+      border:0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    button:active{transform: scale(.98)}
+    .btn-primary{
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color:white;
+      box-shadow: 0 14px 30px rgba(255,77,141,.22);
+    }
+    .btn-ghost{
+      background: #ffffffcc;
+      border: 1px solid rgba(0,0,0,.08);
+      color: var(--ink);
+    }
+    .tiny{
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.34);
+      z-index: 50;
+      padding: 18px;
+    }
+    .modal.open{display:grid;}
+    .modal .box{
+      width:min(520px, 96vw);
+      background:#ffffffee;
+      border:1px solid rgba(255,255,255,.35);
+      border-radius: 22px;
+      box-shadow: 0 26px 70px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+      padding: 18px 18px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal .box::before{
+      content:"";
+      position:absolute; inset:-30px;
+      background: radial-gradient(240px 160px at 20% 20%, rgba(255,77,141,.18), transparent 60%),
+                  radial-gradient(240px 160px at 80% 40%, rgba(120,200,255,.18), transparent 60%);
+      pointer-events:none;
+    }
+    .modal h2{
+      position:relative;
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing:-.02em;
+    }
+    .modal p{
+      position:relative;
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height:1.5;
+      font-size: 14px;
+    }
+    .modal .row{
+      position:relative;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .x{
+      position:absolute;
+      right: 14px;
+      top: 14px;
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: #ffffffcc;
+      border:1px solid rgba(0,0,0,.08);
+      cursor:pointer;
+      z-index:2;
+    }
+
+    /* smooth scroll hint */
+    .scroll-hint{
+      margin-top: 16px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color: var(--muted);
+      font-size: 13px;
+      user-select:none;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:99px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(255,77,141,.12);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1); opacity:.85}
+      50%{transform:scale(1.18); opacity:1}
+    }
+    /* Center content inside the card */
+    /* PAGE 1 layout */
+    .page1-clipart{
+      position: relative;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Soft floating clipart background */
+    .clipart-layer{
+      position: absolute;
+      inset: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='%23ff7fb2' fill-opacity='0.25'%3E%3Cpath d='M100 150s-40-24-40-52c0-18 14-32 32-32 12 0 22 6 26 14 4-8 14-14 26-14 18 0 32 14 32 32 0 28-40 52-40 52z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 180px 180px, 140px 140px;
+      background-position: 0 0, 60px 80px;
+      animation: floatClipart 40s linear infinite;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Movement animation */
+    @keyframes floatClipart{
+      from{
+        background-position: 0 0, 60px 80px;
+      }
+      to{
+        background-position: 0 -800px, 200px -700px;
+      }
+    }
+
+    /* Big centered title */
+    .hero-title{
+      position: relative;
+      z-index: 2;
+      font-size: clamp(46px, 6.8vw, 84px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      max-width: 30ch;
+      margin: 0 auto;
+      color: #111;
+      text-transform: uppercase;
+    }
+
+    .hero-title .accent{
+      color: var(--accent);
+    }
+
+  </style>
+</head>
+
+<body>
+  <!-- floating hearts -->
+  <div class="floaty" id="floaty"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <span aria-hidden="true">💌</span>
+        <span><b>Vivek Namsani</b> • Valentine Edition</span>
+      </div>
+      <div class="pill" title="Single-page site with 3 scrolling cards">
+        <span aria-hidden="true">🪄</span>
+        Filled with Love
+      </div>
+    </header>
+
+    <main class="stack">
+
+      <!-- PAGE 1 -->
+      <section class="card page1-clipart" id="page1">
+        <div class="clipart-layer" aria-hidden="true"></div>
+
+        <h1 class="hero-title">
+          Why do you need to pick<br />
+          <span class="accent">Vivek Namsani</span><br />
+          as your Valentine date?
+        </h1>
+      </section>
+
+
+      <!-- PAGE 2 -->
+      <section class="card" id="page2">
+        <div class="oooo-bg" aria-hidden="true"></div>
+
+        <h1>Because I love you so much</h1>
+        <div class="love-line" aria-label="I love you sooooo much">
+          I love you s<span class="ooo">ooooo</span> much
+        </div>
+
+        <div class="notes">
+          <div class="note" style="--tilt:-1.5deg">
+            <strong>🔗</strong>
+            <p>Your smile makes me smile💗🥰</p>
+          </div>
+          <div class="note" style="--tilt:1.2deg">
+            <strong>🔗</strong>
+            <p>we make each other feel very special✨</p>
+          </div>
+          <div class="note" style="--tilt:-.8deg">
+            <strong>🔗</strong>
+            <p>I love how you take care of Bidu🧸, Puchu🐧 Puchi🥝 and me 😎</p>
+          </div>
+          <div class="note" style="--tilt:1.8deg">
+            <strong>🔗</strong>
+            <p>I keep falling for you every day 💕</p>
+          </div>
+          <div class="note" style="--tilt:-1.1deg">
+            <strong>🔗</strong>
+            <p>it feels soo good to be with you🫂</p>
+          </div>
+          <div class="note" style="--tilt:1deg">
+            <strong>🔗</strong>
+            <p>In case you forgot: your always my fav person to “do anything” with</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- PAGE 3 -->
+      <section class="card" id="page3">
+        <h1>Multiple choice question 😼</h1>
+          <p class="sub">
+            <h3><strong>Will you be my Valentine</h3></strong>
+            <strong>Choose wisely. The cats are watching. (And they are dramatic.)</strong>
+          </p>
+
+        <div class="quiz">
+          <div>
+            <div class="options" role="radiogroup" aria-label="Valentine options">
+              <div class="opt" data-choice="A" role="radio" aria-checked="false" tabindex="0">
+                <div class="label"><span class="badge">A</span> yes</div>
+                <div class="hint">the correct answer</div>
+              </div>
+
+              <div class="opt" data-choice="B" role="radio" aria-checked="false" tabindex="0">
+                <div class="label"><span class="badge">B</span> are you sure??</div>
+                <div class="hint">confused but cute</div>
+              </div>
+
+              <div class="opt" data-choice="C" role="radio" aria-checked="false" tabindex="0">
+                <div class="label"><span class="badge">C</span> U got no options left</div>
+                <div class="hint">heheheheee</div>
+              </div>
+
+              <div class="opt" data-choice="D" role="radio" aria-checked="false" tabindex="0">
+                <div class="label"><span class="badge">D</span> please haan boldo</div>
+                <div class="hint">🥺👉👈</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn-primary" id="doneBtn">Done ✅</button>
+              <button class="btn-ghost" id="resetBtn">Reset</button>
+              <span class="tiny" id="statusText">Pick an option to see the cat reaction.</span>
+            </div>
+          </div>
+
+          <aside class="reaction" aria-live="polite">
+            <div class="top">
+              <b id="reactTitle">Cat reaction</b>
+              <span id="reactSub">waiting for your choice…</span>
+            </div>
+            <img class="gif" id="reactGif" alt="Cat reaction gif" src="" />
+          </aside>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="box">
+      <div class="x" id="closeModal" aria-label="Close">✕</div>
+      <h2>You made the right choice 💖</h2>
+      <p>
+        Have a lovely Valentine. <br/>
+        And I’m hopping to celebrate more and more with you 🫶
+      </p>
+      <div class="row">
+        <button class="btn-primary" id="okBtn">Aww okay 🥰</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // ========= floating hearts =========
+    (function makeHearts(){
+      const host = document.getElementById('floaty');
+      const count = 18;
+      for(let i=0;i<count;i++){
+        const d = document.createElement('div');
+        d.className = 'heart';
+        const left = Math.random()*100;
+        const top = 100 + Math.random()*30;
+        const size = 12 + Math.random()*14;
+        const delay = Math.random()*10;
+        const dur = 10 + Math.random()*10;
+        d.style.left = left + 'vw';
+        d.style.top = top + 'vh';
+        d.style.width = size + 'px';
+        d.style.height = size + 'px';
+        d.style.animationDelay = (-delay) + 's';
+        d.style.animationDuration = dur + 's';
+        d.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 20s-7-4.2-7-9.2C5 7.6 7.6 5 10.8 5c2 0 3.8 1 4.2 2 0.4-1 2.2-2 4.2-2C22.4 5 25 7.6 25 10.8 25 15.8 18 20 18 20" fill="rgba(255,77,141,.55)"/>
+          </svg>`;
+        host.appendChild(d);
+      }
+    })();
+
+    // ========= reveal cards on scroll =========
+    const cards = document.querySelectorAll('section.card');
+    const io = new IntersectionObserver((entries)=>{
+      for(const e of entries){
+        if(e.isIntersecting) e.target.classList.add('visible');
+      }
+    }, { threshold: 0.18 });
+    cards.forEach(c=>io.observe(c));
+
+    // ========= quiz reactions =========
+    // GIPHY media pattern: https://media.giphy.com/media/{ID}/giphy.gif
+    // IDs taken from GIPHY pages (see citations in chat response).
+    const gifs = {
+      A: {
+        title: "YES!! 💘",
+        sub: "approved by the committee of cats",
+        url: "assets/a.gif"
+      },
+      B: {
+        title: "oh no… sorry? 🥺",
+        sub: "cat is doing the soft apology face",
+        url: "file:///C:/Users/vivnamsa/Documents/random/valenpage/assets/b.gif"
+      },
+      C: {
+        title: "excuse me?? 😾",
+        sub: "cat has… opinions (and attitude)",
+        url: "file:///C:/Users/vivnamsa/Documents/random/valenpage/assets/c.gif"
+      },
+      D: {
+        title: "please haan boldo 😭",
+        sub: "cat is crying (same)",
+        url: "file:///C:/Users/vivnamsa/Documents/random/valenpage/assets/d.gif"
+      }
+    };
+    
+
+    const opts = Array.from(document.querySelectorAll('.opt'));
+    const reactGif = document.getElementById('reactGif');
+    const reactTitle = document.getElementById('reactTitle');
+    const reactSub = document.getElementById('reactSub');
+    const statusText = document.getElementById('statusText');
+
+    reactGif.src = "./assets/th.gif";
+
+    let selected = null;
+
+    function setSelected(choice){
+      selected = choice;
+      opts.forEach(o=>{
+        const isMe = o.dataset.choice === choice;
+        o.classList.toggle('selected', isMe);
+        o.setAttribute('aria-checked', isMe ? 'true' : 'false');
+      });
+
+      const r = gifs[choice];
+      reactTitle.textContent = r.title;
+      reactSub.textContent = r.sub;
+      reactGif.src = r.url;
+      statusText.textContent = `Selected: ${choice}. Now click Done ✅`;
+    }
+
+    opts.forEach(o=>{
+      o.addEventListener('click', ()=> setSelected(o.dataset.choice));
+      o.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setSelected(o.dataset.choice);
+        }
+      });
+    });
+
+    // ========= confetti + modal =========
+    const modal = document.getElementById('modal');
+    const doneBtn = document.getElementById('doneBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const closeModal = document.getElementById('closeModal');
+    const okBtn = document.getElementById('okBtn');
+
+    function openModal(){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeIt(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    function doConfetti(){
+      // quick, soft burst
+      const duration = 900;
+      const end = Date.now() + duration;
+
+      (function frame(){
+        confetti({
+          particleCount: 5,
+          spread: 70,
+          startVelocity: 28,
+          ticks: 120,
+          origin: { x: Math.random()*0.4 + 0.3, y: 0.15 + Math.random()*0.15 }
+        });
+        if(Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+
+    doneBtn.addEventListener('click', ()=>{
+      if(!selected){
+        statusText.textContent = "Pick an option first 😼";
+        // tiny shake
+        doneBtn.animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-6px)' },
+          { transform: 'translateX(6px)' },
+          { transform: 'translateX(0)' }
+        ], { duration: 260, easing:'ease-out' });
+        return;
+      }
+      doConfetti();
+      openModal();
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      selected = null;
+      opts.forEach(o=>{
+        o.classList.remove('selected');
+        o.setAttribute('aria-checked','false');
+      });
+      reactTitle.textContent = "Cat reaction";
+      reactSub.textContent = "waiting for your choice…";
+      reactGif.removeAttribute('src');
+      statusText.textContent = "Pick an option to see the cat reaction.";
+    });
+
+    closeModal.addEventListener('click', closeIt);
+    okBtn.addEventListener('click', closeIt);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeIt(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeIt(); });
+  </script>
+</body>
+</html>
